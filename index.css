@@ -1,0 +1,133 @@
+/*General Layout */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: auto;
+  margin: 0;
+
+  
+  background-image: url(chilly.png),
+    url(sunny.png),
+    url(cloudy.png),
+    url(rainy.png);
+  
+  transition: background-size ease-out 500ms;
+  background-repeat: no-repeat;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  font-size: 18px;
+}
+
+#top {
+  flex: .5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#bottom {
+  flex: 4;
+  padding: 2%;
+
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1%;
+  row-gap: 20px;
+}
+
+/*Weather Form*/
+#weather-form {
+  margin-top: 1%;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+#weather-form > * {
+  font-size: inherit;
+  flex: 0 1 auto;
+  min-width: 0px;
+  width: 250px;
+  padding: 0.5%;
+  background-color: rgba(255, 255, 255, 0.65);
+  border: none;
+  border-radius: 3px;
+}
+
+#weather-form > button {
+  background-color: rgba(199, 199, 199, 0.65);
+}
+
+#weather-form > input::placeholder {
+  opacity: 1;
+  color: rgb(80, 80, 80);
+}
+
+#weather-form > input:focus, #weather-form > select:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.65);
+}
+
+#weather-form > button:active {
+  outline: 2px solid rgba(199, 199, 199, 0.65);
+}
+
+#weather-form select:invalid {
+  color: rgb(80, 80, 80);
+}
+
+.form-info {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.65);
+  font-family: sans-serif;
+  align-self: center;
+}
+
+.form-messages {
+  margin: 0;
+  min-height: 18px;
+  color: red;
+  font-weight: bold;
+  font-family: sans-serif;
+  align-self: center;
+}
+
+
+/*Weather Data*/
+.current-data {
+  flex: 2 1 auto;
+  /*must use vh here*/
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 85vh; 
+  width: 550px;
+  background-color: rgba(255, 255, 255, 0.65);
+  border-radius: 7px;
+  box-shadow: 0px 0px 15px 1px rgb(100, 100, 100);
+}
+
+.current-data > * {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  text-transform: capitalize;
+  word-break:break-all;
+}
+
+.current-img {
+  flex: 1;
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+}
+
