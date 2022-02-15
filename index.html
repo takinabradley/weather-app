@@ -12,10 +12,10 @@
   <body>
     <div id="top">
       <form id="weather-form">
-        <input type="text" id="city-input" placeholder="City*" 
+        <input type="text" id="city-input" placeholder="City" 
                title="City" required/>
 
-        <select id="country-select" title="Country" required>
+        <select id="country-select" title="Country">
           <option value="">Country</option>
           <option value="AF">Afghanistan</option>
           <option value="AX">Åland Islands</option>
@@ -268,7 +268,7 @@
           <option value="ZW">Zimbabwe</option>
         </select>
 
-        <select id='state-select' title="US States Only" disabled required>
+        <select id='state-select' title="US States Only" disabled>
           <option value="">State (US Only)</option>
           <option value="AL">Alabama</option>
           <option value="AK">Alaska</option>
@@ -331,9 +331,19 @@
 
     <div id="bottom">
       <div class="current-data">
-        <img class="current-img" src="" />
+        <img class="current-img" src=""/>
         <p class="current-description"></p>
         <p class="current-other"></p>
+      </div>
+
+      <div class="forecast-data">
+        <div class=""></div>
+        <div class=""></div>
+        <div class=""></div>
+        <div class=""></div>
+        <div class=""></div>
+        <div class=""></div>
+        <div class=""></div>
       </div>
     </div>
   </body>
