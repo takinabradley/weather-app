@@ -15,10 +15,7 @@ async function checkCurrentWeather(...location) {
   }
 }
 
-
-
 //DOM logic
-
 const DOMController = (function(){
 
   function changeBackground(currentWeatherMain) {
@@ -75,19 +72,22 @@ const DOMController = (function(){
   
   async function displayWeather(e) {
     e.preventDefault()
-  
+    const errMessages = document.querySelector('.form-messages')
     const location = [
+      //replaces spaces with '+' for API call
       document.querySelector('#city-input').value.replace(/\s+/g, '+'),
       document.querySelector('#state-select').value,
       document.querySelector('#country-select').value
     ]
-    console.log(location)
+
     const weather = await checkCurrentWeather(location)
+
+    console.log(location)
     console.log(weather)
-    const errMessages = document.querySelector('.form-messages')
     if(typeof weather === 'object') {
       errMessages.textContent = ''
-      changeBackground(weather.data.current.weather[0].main)
+      const weatherDescription = weather.data.current.weather[0].main
+      changeBackground(weatherDescription)
       appendCurrentWeather(weather.data.current, weather.iconUrl)
       appendForecast()
     } else {
@@ -96,7 +96,13 @@ const DOMController = (function(){
     }
   }
   
-  function enableStateSelector(e) {
+  return {displayWeather}
+})()
+
+
+//Form logic
+const FormController = (function() {
+  function enableUSStates(e) {
     if(e.target.value === 'US') {
       document.querySelector('#state-select').removeAttribute('disabled')
     } else {
@@ -104,17 +110,30 @@ const DOMController = (function(){
     }
   }
 
-  document.querySelector('form').addEventListener('submit', displayWeather)
-  document.querySelector('#country-select').addEventListener('change', enableStateSelector)
+  /*changeSelectColor allows styling of optional select elements as if they had 
+  the 'required' attribute. I dispatch the event immediately to give them a 
+  fake 'invalid' class synonomous with the :invalid selector upon pageload. */
+  function changeSelectColor(e) {
+    if(e.target.value === '') {
+      e.target.classList.add('invalid')
+    } else {
+      e.target.classList.remove('invalid')
+    }
+  }
 
-  return {displayWeather, enableStateSelector}
+  function initForm() {
+    document.querySelectorAll('select').forEach(selectElem => {
+      selectElem.addEventListener('change', changeSelectColor)
+      selectElem.dispatchEvent(new Event('change'))
+    })
+
+    document.querySelector('#country-select').addEventListener('change', enableUSStates)
+    document.querySelector('form').addEventListener('submit', DOMController.displayWeather)
+  }
+
+  initForm()
 })()
 
-
-
-//document.querySelector('#state-list').options.map(option => option.value)
-//document.querySelector('#country-list').options
-//message: must use a two letter state/country code
 //http://api.openweathermap.org/data/2.5/weather?q=London&appid=399346ae1e970c4f9bd870c6c64bdc7c
 //weather conditions list: https://openweathermap.org/weather-conditions
 //icons url: http://openweathermap.org/img/wn/10d@2x.png
