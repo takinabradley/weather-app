@@ -1,15 +1,11 @@
 //API logic
-async function checkCurrentWeather(...location) {
+async function checkCurrentWeather(location) {
   try {
-    let coordsRequest = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${location.toString()}&limit=1&appid=399346ae1e970c4f9bd870c6c64bdc7c`)
-    let coords = await coordsRequest.json()
-    console.log(coords)
-    //using onecall api for current weather + forecast
-    let weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${coords[0].lat}&lon=${coords[0].lon}&exclude=minutely,hourly,alerts&units=metric&appid=399346ae1e970c4f9bd870c6c64bdc7c`)
-    //let weatherResponse = await fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${coords[0].lat}&lon=${coords[0].lon}&units=metric&appid=399346ae1e970c4f9bd870c6c64bdc7c`)
-    let weather = await weatherResponse.json()
-    let iconUrl = `https://openweathermap.org/img/wn/${weather.current.weather[0].icon}@4x.png`
-    return {data: weather, iconUrl};
+    const coordsRequest = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${location.toString()}&limit=1&appid=399346ae1e970c4f9bd870c6c64bdc7c`)
+    const coords = await coordsRequest.json()
+    const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${coords[0].lat}&lon=${coords[0].lon}&exclude=minutely,hourly,alerts&units=metric&appid=399346ae1e970c4f9bd870c6c64bdc7c`)
+    const weather = await weatherResponse.json()
+    return {data: weather, location: coords};
   } catch(err) {
     return 'Could not find that city'
   }
@@ -17,7 +13,6 @@ async function checkCurrentWeather(...location) {
 
 //DOM logic
 const DOMController = (function(){
-
   function changeBackground(currentWeatherMain) {
     let body = document.querySelector('body')
     let cloudyConditions = [
@@ -37,26 +32,55 @@ const DOMController = (function(){
       body.style.backgroundSize = '0% 100%, 0% 100%, 0% 100%, 100% 100%'
     }
   }
+
+  function makeIconUrl(iconName) {
+    return `https://openweathermap.org/img/wn/${iconName}@4x.png`
+  }
   
-  function appendCurrentWeather(currentWeather, iconUrl) {
-    const weatherData = document.querySelector('.current-data')
-    const weatherDescription = document.querySelector('.current-description')
-    const weatherImg = document.querySelector('.current-img')
-    const weatherOther = document.querySelector('.current-other')
+  function appendCurrentWeather(weather) {
+    const currentLocation = document.querySelector('.current-location')
+    const currentDate = document.querySelector('.current-date')
+    const currentDescription = document.querySelector('.current-description')
+    const currentImg = document.querySelector('.current-img')
+    const currentTemp = document.querySelector('.current-temp')
+    const currentHumidity = document.querySelector('.current-humidity')
+    const currentClouds = document.querySelector('.current-clouds')
+    const currentWindspeed = document.querySelector('.current-windspeed')
+    const currentRainSnow = document.querySelector('.current-rain-snow')
+    const currentOther = document.querySelector('.current-other')
   
-    let conditionsDescription = currentWeather.weather[0].description
-    weatherDescription.textContent = conditionsDescription
-    weatherImg.src = iconUrl
-    weatherOther.textContent = JSON.stringify(currentWeather.main) +
-                               JSON.stringify(currentWeather.wind)
+    currentLocation.textContent = `${weather.location[0].name}, ${weather.location[0].state}`
+    currentDate.textContent = `${unixTimeToDate(weather.data.current.dt)}`
+    currentDescription.textContent = weather.data.current.weather[0].description
+    currentImg.src = makeIconUrl(weather.data.current.weather[0].icon)
+    currentTemp.textContent = `${weather.data.current.temp} °C`
+    currentHumidity.textContent = `Humidity: ${weather.data.current.humidity}%`
+    currentClouds.textContent = `Cloud Cover: ${weather.data.current.clouds}%`
+    currentWindspeed.textContent = `Wind Speed: ${weather.data.current.wind_speed} km/h`
   
-    if(currentWeather.rain || currentWeather.snow) {
-      weatherOther.textContent += JSON.stringify(currentWeather.rain || currentWeather.snow)
+    if(weather.data.current.rain || weather.data.current.snow) {
+      if(weather.data.current.rain) {
+        currentRainSnow.textContent = `Rain: ${JSON.stringify(weather.data.current.rain["1h"])} cm/h` 
+      } else {
+        currentRainSnow.textContent = `Snow: ${JSON.stringify(weather.data.current.snow["1h"])} cm/h`  
+      }
     }
   }
   
-  function appendForecast(forecast) {
-  
+  function appendForecast(weather) {
+    const forecastElems = document.querySelectorAll('.forecast')
+
+    forecastElems.forEach( (card, index) => {
+      const date = card.querySelector('.forecast-date')
+      const minTemp = card.querySelector('.forecast-min')
+      const maxTemp = card.querySelector('.forecast-max')
+
+      //index + 1 is used because forecast data includes the current date
+      date.textContent = unixTimeToDate(weather.data.daily[index + 1].dt)
+      minTemp.textContent = `Min: ${weather.data.daily[index + 1].temp.min} °C`
+      maxTemp.textContent = `Max: ${weather.data.daily[index + 1].temp.max} °C`
+      card.style.backgroundImage = `url(${makeIconUrl(weather.data.daily[index + 1].weather[0].icon)})`
+    })
   }
 
   function unixTimeToDate(unixTime) {
@@ -88,8 +112,8 @@ const DOMController = (function(){
       errMessages.textContent = ''
       const weatherDescription = weather.data.current.weather[0].main
       changeBackground(weatherDescription)
-      appendCurrentWeather(weather.data.current, weather.iconUrl)
-      appendForecast()
+      appendCurrentWeather(weather)
+      appendForecast(weather)
     } else {
       console.log(weather)
       errMessages.textContent = weather
