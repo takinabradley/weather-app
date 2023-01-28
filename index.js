@@ -158,6 +158,7 @@ const FormController = (function() {
   initForm()
 })()
 
+console.log(navigator.geolocation)
 //http://api.openweathermap.org/data/2.5/weather?q=London&appid=399346ae1e970c4f9bd870c6c64bdc7c
 //weather conditions list: https://openweathermap.org/weather-conditions
 //icons url: http://openweathermap.org/img/wn/10d@2x.png
